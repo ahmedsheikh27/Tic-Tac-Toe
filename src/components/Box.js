@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './box.css';
+import HashLoader
+  from "react-spinners/HashLoader";
+import Img from '../components/xo.png'
 
 const Box = () => {
   const [board, setBoard] = useState(Array(9).fill(''));
-  const [currentPlayer, setCurrentPlayer] = useState('X');
+  const [currentPlayer, setCurrentPlayer] = useState('x');
   const [winner, setWinner] = useState(null);
   const [isDraw, setIsDraw] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate async operation
+    setTimeout(() => {
+      setLoading(false); // Loading complete
+    }, 4000);
+  }, []);
 
   const handleClick = (index) => {
     if (winner || isDraw || board[index] !== '') {
@@ -16,7 +27,7 @@ const Box = () => {
     newBoard[index] = currentPlayer;
     setBoard(newBoard);
 
-    const nextPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    const nextPlayer = currentPlayer === 'x' ? 'o' : 'x';
     setCurrentPlayer(nextPlayer);
 
     const gameWinner = calculateWinner(newBoard);
@@ -57,33 +68,63 @@ const Box = () => {
 
   const resetGame = () => {
     setBoard(Array(9).fill(''));
-    setCurrentPlayer('X');
+    setCurrentPlayer('x');
     setWinner(null);
     setIsDraw(false);
   };
 
   return (
-    <div className="tic-tac-toe">
-        {isDraw ? (
-        <div className="message">It's a draw!</div>
-      ) : (
-        <div className="message">Current Player: {currentPlayer}</div>
-      )}
-        <div className="button-container">
-        <button className="reset-button" onClick={resetGame}>
-          Reset Game
-        </button>
-      </div>
-      <div className="board">
-        {board.map((square, index) => (
-          <div key={index} className="square-container">
-            {renderSquare(index)}
+
+    <>
+      <div className='loader'>
+
+        {
+          loading ?
+            <HashLoader
+              className='loader'
+              color={'red'}
+              loading={loading}
+              size={50}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            /> :
+
+            <div className="tic-tac-toe">
+              <div className='head'>
+                <img src={Img} alt='' className='icon' />
+                <div className="player">Current Player: {currentPlayer}</div>
+              </div>
+              <div className="board">
+                {board.map((square, index) => (
+                  <div key={index} className="square-container">
+                    {renderSquare(index)}
+                  </div>
+                ))}
+              </div>
+
+              <footer className='foot'>Made by Muhammad Ahmed Amin❤️</footer>
+
+
+            </div>
+        }
+        {winner ? (
+          <div className='win'>
+            <div className='winner'>Winner is {winner}
+              <button className='reset' onClick={resetGame}>Play Again</button>
+            </div>
           </div>
-        ))}
+        ) : isDraw ? (
+          <div className='win'>
+            <div className="winner">It's a Draw! <button className="reset" onClick={resetGame}>
+              Play Again
+            </button> </div>
+          </div>
+        ) : <> </>}
+
+
+
       </div>
-      {winner ? <> <div className='winner'>Winner is {winner} <div className='restart' onClick={resetGame}> 
-        </div></div> </> : <></>}
-    </div>
+    </>
   );
 };
 
